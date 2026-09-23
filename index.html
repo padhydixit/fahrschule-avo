@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fahrschule Avo — Scroll Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- persistent brand mark, visible across every scene -->
+  <a class="brand-mark" href="#top" aria-label="Fahrschule Avo Startseite">
+    <img src="Pictures/avo-logo-white.png" alt="Fahrschule Avo" />
+  </a>
+
+  <!-- headlight that follows the cursor through the dark anxiety scenes -->
+  <div class="spotlight-overlay" id="spotlight"></div>
+
+  <!-- custom cursor: dot + lagging ring, morphs on interactive hover -->
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <!-- progress bar shows scroll position -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- Tesla-style HUD: flat status bar, thin lines, no cartoon 3D -->
+  <div class="hud" id="hud">
+    <div class="hud-section hud-gear">
+      <span data-gear="P">P</span><span data-gear="R">R</span><span data-gear="N">N</span><span data-gear="D">D</span>
+    </div>
+    <div class="hud-divider"></div>
+    <div class="hud-section hud-range">
+      <span class="hud-caption">KONFIDENZ</span>
+      <div class="hud-track">
+        <div class="hud-track-fill" id="hudTrackFill"></div>
+        <div class="hud-track-marker" id="hudTrackMarker"></div>
+      </div>
+    </div>
+    <div class="hud-divider"></div>
+    <div class="hud-section hud-readout">
+      <span id="hudRange">00%</span>
+    </div>
+  </div>
+
+  <button class="reduced-motion-toggle" id="motionToggle" aria-pressed="false">
+    Reduzierte Bewegung
+  </button>
+
+  <main id="story">
+
+    <!-- SCENE 1: THE FREEZE — anxiety, hesitation -->
+    <section class="scene scene-1" data-scene="1">
+      <div class="grain"></div>
+      <div class="vignette"></div>
+      <div class="scene-content">
+        <img class="hero-logo" src="Pictures/avo-logo-white.png" alt="Fahrschule Avo" />
+        <p class="eyebrow">FAHRSCHULE AVO · HAMBURG-WANDSBEK</p>
+        <h1 class="headline word-reveal">
+          <span>Jeder</span> <span>fängt</span> <span>bei</span> <span>Null</span> <span>an.</span>
+        </h1>
+        <p class="subline">Der erste Schritt fühlt sich immer am schwersten an.</p>
+
+        <!-- car materializes as line-art while the scene grades from grey to white -->
+        <div class="hud-car-wrap">
+          <div class="hud-reticle tl"></div>
+          <div class="hud-reticle tr"></div>
+          <div class="hud-reticle bl"></div>
+          <div class="hud-reticle br"></div>
+          <svg class="hud-car" viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet">
+            <line id="carBaseline" class="car-baseline" x1="10" y1="122" x2="390" y2="122" />
+            <path id="carBody" class="car-path" d="M20,100 C20,80 40,80 60,78 L110,50 C130,38 160,32 195,32 L260,32 C285,32 300,45 310,60 L370,70 C382,72 388,80 388,90 L388,100 L20,100" />
+            <circle id="wheelA" class="car-wheel" cx="95" cy="104" r="17" />
+            <circle id="wheelB" class="car-wheel" cx="300" cy="104" r="17" />
+          </svg>
+          <div class="hud-scan-text" id="hudScanText">VEHICLE DETECTED // STATUS: READY</div>
+        </div>
+
+        <div class="scroll-cue">Scroll ↓</div>
+      </div>
+    </section>
+
+    <!-- SCENE 2: THE NOISE — overwhelm -->
+    <section class="scene scene-2" data-scene="2">
+      <div class="noise-field">
+        <span class="shard s1">Theorieprüfung?</span>
+        <span class="shard s2">Wie viele Stunden brauche ich?</span>
+        <span class="shard s3">Was kostet das?</span>
+        <span class="shard s4">Schaffe ich das überhaupt?</span>
+        <span class="shard s5">B197 oder B78?</span>
+      </div>
+      <div class="scene-content">
+        <h2 class="headline">Zu viele Fragen. <br />Zu wenig Klarheit.</h2>
+      </div>
+    </section>
+
+    <!-- SCENE 3: THE GUIDE APPEARS — reassurance, roadmap -->
+    <section class="scene scene-3" data-scene="3">
+      <div class="scene-content">
+        <p class="eyebrow">DEIN TEMPO</p>
+        <h2 class="headline">Ein klarer Weg.<br />Persönlich begleitet.</h2>
+        <div class="route">
+          <svg viewBox="0 0 1000 120" class="route-svg" preserveAspectRatio="none">
+            <path id="routePath" d="M0,100 C 200,20 350,100 500,60 S 800,20 1000,60" />
+          </svg>
+          <div class="route-steps">
+            <div class="route-step"><span class="dot"></span>Ankommen<br /><small>Beratung &amp; Anmeldung</small></div>
+            <div class="route-step"><span class="dot"></span>Wissen<br /><small>Theorie &amp; Praxis</small></div>
+            <div class="route-step"><span class="dot"></span>Erfahren<br /><small>Praxis sammeln</small></div>
+            <div class="route-step"><span class="dot"></span>Bestehen<br /><small>Prüfung</small></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 4: MOMENTUM BUILDING — license classes, parallax drive -->
+    <section class="scene scene-4" data-scene="4">
+      <div class="road-parallax">
+        <div class="road-layer sky"></div>
+        <div class="road-layer buildings"></div>
+        <div class="road-layer road"></div>
+      </div>
+      <div class="scene-content">
+        <h2 class="headline light">Dein Führerschein.</h2>
+        <div class="license-cards">
+          <div class="card cursor-hover"><h3>B</h3><p>Der klassische Autoführerschein.</p><small>AB 18 JAHREN</small></div>
+          <div class="card cursor-hover"><h3>BF17</h3><p>Begleitet fahren, früh Erfahrung sammeln.</p><small>AB 17 JAHREN</small></div>
+          <div class="card cursor-hover"><h3>B197</h3><p>Schaltung lernen, Automatik prüfen.</p><small>FLEXIBEL</small></div>
+          <div class="card cursor-hover"><h3>B78</h3><p>Ausbildung ausschließlich auf Automatik.</p><small>NUR AUTOMATIK</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 5: FULL ACCELERATION — fleet reveal, horizontal feel -->
+    <section class="scene scene-5" data-scene="5">
+      <div class="scene-content">
+        <p class="eyebrow">UNSER FUHRPARK</p>
+        <h2 class="headline light">Modern. Ruhig. Sicher.</h2>
+      </div>
+      <div class="fleet-track" id="fleetTrack">
+        <div class="fleet-card fleet-1" style="background-image: url('Pictures/tesla-model-y-rear.webp')">
+          <span class="fleet-index">01</span>
+          <span>Tesla Model Y</span><small>Performance</small>
+        </div>
+        <div class="fleet-card fleet-2" style="background-image: url('Pictures/tesla-model-3.webp')">
+          <span class="fleet-index">02</span>
+          <span>Tesla Model 3</span><small>Leise &amp; klar</small>
+        </div>
+        <div class="fleet-card fleet-3" style="background-image: url('Pictures/audi-a3.webp')">
+          <span class="fleet-index">03</span>
+          <span>Audi A3</span><small>Präzise &amp; vertraut</small>
+        </div>
+      </div>
+      <div class="fleet-progress" id="fleetProgress">
+        <span class="fleet-dot active" data-index="0"></span>
+        <span class="fleet-dot" data-index="1"></span>
+        <span class="fleet-dot" data-index="2"></span>
+      </div>
+      <div class="testimonial-pop">
+        <span class="bubble b1">„Beim ersten Mal bestanden.“</span>
+        <span class="bubble b2">„Ruhig und geduldig erklärt.“</span>
+        <span class="bubble b3">„Perfekt organisiert.“</span>
+      </div>
+    </section>
+
+    <!-- SCENE 6: ARRIVAL / FREEDOM — triumph -->
+    <section class="scene scene-6" data-scene="6">
+      <div class="sunburst"></div>
+      <div class="scene-content">
+        <h2 class="headline huge">Bestanden.</h2>
+        <div class="stats">
+          <div class="stat"><span class="count" data-target="5.0">0</span><small>Sterne</small></div>
+          <div class="stat"><span class="count" data-target="53">0</span><small>Bewertungen</small></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCENE 7: CALL TO THE ROAD — CTA -->
+    <section class="scene scene-7" data-scene="7">
+      <div class="scene-content contact-content">
+        <img class="brand-logo" src="Pictures/avo-logo-white.png" alt="Fahrschule Avo Logo" />
+        <h2 class="headline">Dein Führerschein?<br />Startet hier.</h2>
+        <p class="subline">Trag deinen Terminwunsch ein. Wir melden uns persönlich bei dir und bestätigen den passenden Zeitpunkt.</p>
+
+        <form class="booking-form" id="bookingForm">
+          <div class="form-row">
+            <input class="cursor-hover" type="text" name="vorname" placeholder="Vorname" required />
+            <input class="cursor-hover" type="text" name="nachname" placeholder="Nachname" required />
+          </div>
+          <div class="form-row">
+            <input class="cursor-hover" type="tel" name="telefon" placeholder="Telefon" required />
+            <input class="cursor-hover" type="email" name="email" placeholder="E-Mail" required />
+          </div>
+          <div class="form-row">
+            <select class="cursor-hover" name="anliegen">
+              <option value="">Worum geht es? (optional)</option>
+              <option value="B">Führerschein B</option>
+              <option value="BF17">BF17</option>
+              <option value="B197">B197</option>
+              <option value="B78">B78 (nur Automatik)</option>
+              <option value="Wechsel">Fahrschulwechsel</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <input class="cursor-hover" type="date" name="datum" placeholder="Wunschdatum" />
+            <input class="cursor-hover" type="time" name="uhrzeit" placeholder="Bevorzugte Uhrzeit" />
+          </div>
+          <textarea class="cursor-hover" name="nachricht" placeholder="Deine Nachricht (optional)" rows="3"></textarea>
+          <label class="consent-row">
+            <input type="checkbox" name="whatsappConsent" />
+            Ich habe die <a class="cursor-hover" href="https://fahrschule-avo-wandsbek.g-avo.chatgpt.site/datenschutzerklaerung/" target="_blank" rel="noopener">Datenschutzerklärung</a> gelesen und möchte meine Angaben per WhatsApp übermitteln.
+          </label>
+          <button class="cta-primary cursor-hover" type="submit">Terminwunsch senden ↗</button>
+          <p class="form-hint" id="formHint"></p>
+        </form>
+
+        <div class="cta-row">
+          <a class="cta-secondary cursor-hover" href="https://fs0572.fso360-svc.de/" target="_blank" rel="noopener">Direkt anmelden ↗</a>
+          <a class="cta-secondary cursor-hover" href="https://wa.me/4917623794488" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+
+        <div class="contact-block">
+          <a class="cursor-hover" href="https://maps.google.com/?q=Wandsbeker+Chaussee+123,+22089+Hamburg" target="_blank" rel="noopener">Wandsbeker Chaussee 123 · 22089 Hamburg ↗</a>
+          <a class="cursor-hover" href="tel:+494036840777">040 368 40 777</a>
+          <a class="cursor-hover" href="mailto:info@fahrschule-avo.de">info@fahrschule-avo.de</a>
+        </div>
+
+        <a class="google-badge cursor-hover" href="https://www.google.com/maps/search/?api=1&query=Fahrschule+Avo+Hamburg-Wandsbek" target="_blank" rel="noopener">
+          ★★★★★ 5,0 · 53 Google-Bewertungen ↗
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="script.js"></script>
+  <script src="hud.js"></script>
+</body>
+</html>

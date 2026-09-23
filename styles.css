@@ -1,0 +1,717 @@
+:root {
+  --ink: #0a0c10;
+  --paper: #f5f3ee;
+  --accent: #d6ff3f;
+  --accent-warm: #ff7a45;
+  --road: #2b2f36;
+}
+
+* { box-sizing: border-box; }
+
+/* native smooth-scroll fights with GSAP ScrollTrigger's own scrub smoothing — causes input lag */
+html { scroll-behavior: auto; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: var(--ink);
+  color: var(--paper);
+  overflow-x: hidden;
+}
+
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 3px;
+  width: 0%;
+  background: linear-gradient(90deg, #7d8494, var(--accent));
+  z-index: 100;
+  transition: width 0.05s linear;
+}
+
+.reduced-motion-toggle {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 100;
+  background: rgba(255,255,255,0.08);
+  color: var(--paper);
+  border: 1px solid rgba(255,255,255,0.25);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+}
+.reduced-motion-toggle[aria-pressed="true"] { background: var(--accent); color: var(--ink); }
+
+.scene {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 40px 24px;
+}
+
+.scene-content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  text-align: center;
+}
+
+.eyebrow {
+  letter-spacing: 3px;
+  font-size: 12px;
+  color: #9aa1ad;
+  margin-bottom: 12px;
+}
+
+.headline {
+  font-size: clamp(2rem, 6vw, 4.2rem);
+  line-height: 1.1;
+  margin: 0 0 16px;
+  font-weight: 700;
+}
+.headline.light { color: var(--paper); }
+.headline.huge { font-size: clamp(3rem, 12vw, 8rem); color: var(--ink); }
+
+.subline { color: #9aa1ad; font-size: 1.1rem; }
+
+.scroll-cue {
+  margin-top: 40px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  animation: bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(8px);} }
+
+/* SCENE 1: anxiety -> desaturated, tight, pulsing vignette */
+.scene-1 {
+  background: radial-gradient(circle at 50% 40%, #1a1d24, #050608 75%);
+  filter: grayscale(1) contrast(1.1);
+  transition: filter 0.8s ease;
+}
+body.confidence-ready .scene-1 { filter: grayscale(0) contrast(1); }
+body:not(.confidence-ready) .hud-car-wrap { opacity: 0; }
+.hud-car-wrap { transition: opacity 0.2s ease; }
+.scene-1 .vignette {
+  position: absolute; inset: 0;
+  box-shadow: inset 0 0 200px 60px rgba(0,0,0,0.9);
+  animation: pulse 3.2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%,100% { box-shadow: inset 0 0 200px 60px rgba(0,0,0,0.9); }
+  50% { box-shadow: inset 0 0 260px 90px rgba(0,0,0,0.75); }
+}
+.scene-1 .grain {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 3px 3px;
+  opacity: 0.5;
+}
+.word-reveal span {
+  display: inline-block;
+  opacity: 0.15;
+  transition: opacity 0.4s ease;
+}
+body.confidence-ready .word-reveal span { opacity: 1; }
+.word-reveal span:nth-child(2) { transition-delay: 0.07s; }
+.word-reveal span:nth-child(3) { transition-delay: 0.14s; }
+.word-reveal span:nth-child(4) { transition-delay: 0.21s; }
+.word-reveal span:nth-child(5) { transition-delay: 0.28s; }
+
+/* SCENE 2: noise / overwhelm */
+.scene-2 {
+  background: linear-gradient(180deg, #0c0e12, #14171d 60%, #1c2028);
+  filter: grayscale(0.6);
+}
+.noise-field { position: absolute; inset: 0; z-index: 1; }
+.shard {
+  position: absolute;
+  font-size: 14px;
+  color: #7d8494;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.03);
+  white-space: nowrap;
+  will-change: transform;
+}
+.s1 { top: 15%; left: 8%; }
+.s2 { top: 65%; left: 12%; }
+.s3 { top: 30%; right: 10%; }
+.s4 { top: 78%; right: 14%; }
+.s5 { top: 45%; left: 42%; }
+
+/* SCENE 3: guide appears, road drawing */
+.scene-3 { background: linear-gradient(180deg, #14171d, #232a1f 60%, #2b3a22); }
+.route { margin-top: 48px; }
+.route-svg { width: 100%; height: 90px; }
+.route-svg path {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+}
+.route-steps {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--paper);
+  flex-wrap: wrap;
+}
+.route-step { flex: 1; min-width: 120px; opacity: 0.3; transition: opacity 0.4s ease; }
+.route-step.active { opacity: 1; }
+.route-step small { color: #9aa1ad; font-weight: 400; }
+.dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* SCENE 4: momentum, parallax drive + license cards */
+.scene-4 { background: #171a20; }
+.road-parallax { position: absolute; inset: 0; z-index: 0; }
+.road-layer { position: absolute; left: 0; right: 0; }
+.road-layer.sky { top: 0; height: 55%; background: linear-gradient(180deg,#2a3550,#4d6a8f); }
+.road-layer.buildings {
+  top: 35%; height: 30%;
+  background: linear-gradient(90deg, #10151c 0 8%, #252d35 8% 15%, #121820 15% 21%, #29323b 21% 28%, #131920 28% 36%, #252d35 36% 46%, #111820 46% 55%, #2b333b 55% 68%, #141b22 68% 77%, #29313a 77% 87%, #111820 87% 100%);
+  clip-path: polygon(0 100%, 0 42%, 4% 42%, 4% 65%, 10% 65%, 10% 28%, 14% 28%, 14% 52%, 20% 52%, 20% 16%, 25% 16%, 25% 58%, 32% 58%, 32% 39%, 40% 39%, 40% 62%, 47% 62%, 47% 24%, 52% 24%, 52% 55%, 59% 55%, 59% 8%, 64% 8%, 68% 33%, 72% 4%, 76% 31%, 81% 10%, 86% 48%, 92% 48%, 92% 26%, 97% 26%, 97% 60%, 100% 60%, 100% 100%);
+  filter: drop-shadow(0 -8px 18px rgba(7,10,14,0.55));
+}
+.road-layer.buildings::before {
+  content: "";
+  position: absolute;
+  left: 58%;
+  bottom: 0;
+  width: 20%;
+  height: 86%;
+  background: repeating-linear-gradient(90deg, rgba(255,218,132,0.42) 0 2px, transparent 2px 12px), linear-gradient(150deg, transparent 0 18%, #1a232c 18% 33%, transparent 33% 44%, #1a232c 44% 60%, transparent 60% 100%);
+  clip-path: polygon(0 100%, 0 36%, 24% 0, 47% 31%, 70% 0, 100% 41%, 100% 100%);
+  opacity: 0.9;
+}
+.road-layer.road { bottom: 0; height: 40%; background: var(--road); }
+.license-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+.card {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 14px;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+  transform: translateY(40px);
+  opacity: 0;
+  transition: all 0.5s ease;
+}
+.card.in-view { transform: translateY(0); opacity: 1; }
+.card h3 { margin: 0 0 8px; font-size: 1.8rem; color: var(--accent); }
+.card p { margin: 0 0 10px; font-size: 0.9rem; color: #d6d9de; }
+.card small { color: #9aa1ad; letter-spacing: 1px; }
+
+/* SCENE 5: fleet reveal + testimonials, color saturating */
+.scene-5 { background: linear-gradient(180deg, #1c2130, #2d3b2f); flex-direction: column; }
+.fleet-track {
+  display: flex;
+  gap: 24px;
+  margin-top: 40px;
+  transform: translateX(0);
+  will-change: transform;
+}
+.fleet-card {
+  min-width: 260px;
+  height: 180px;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 18px;
+  font-weight: 600;
+  color: var(--paper);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+}
+.fleet-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10,12,16,0) 40%, rgba(10,12,16,0.85) 100%);
+}
+.fleet-card span, .fleet-card small { position: relative; z-index: 1; }
+.fleet-card small { font-weight: 400; opacity: 0.8; }
+.testimonial-pop { position: relative; height: 80px; width: 100%; max-width: 900px; margin-top: 40px; }
+.bubble {
+  position: absolute;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.5s ease;
+}
+.bubble.in-view { opacity: 1; transform: scale(1); }
+.b1 { left: 5%; top: 0; }
+.b2 { left: 38%; top: 20px; }
+.b3 { right: 5%; top: 5px; }
+
+/* SCENE 6: triumph, bright */
+.scene-6 { background: radial-gradient(circle at 50% 40%, #fff7dc, var(--accent) 70%); }
+.scene-6 .headline.huge { color: var(--ink); }
+.sunburst {
+  position: absolute; inset: -20%;
+  background: repeating-conic-gradient(rgba(255,255,255,0.5) 0deg 4deg, transparent 4deg 12deg);
+  animation: spin 40s linear infinite;
+  opacity: 0.4;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.stats { display: flex; gap: 60px; justify-content: center; margin-top: 24px; }
+.stat { color: var(--ink); }
+.count { font-size: 2.5rem; font-weight: 800; display: block; }
+
+/* SCENE 7: CTA */
+.scene-7 { background: var(--ink); }
+.cta-row { display: flex; gap: 16px; justify-content: center; margin: 28px 0; flex-wrap: wrap; }
+.cta-primary, .cta-secondary {
+  padding: 14px 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.cta-primary { background: var(--accent); color: var(--ink); }
+.cta-secondary { border: 1px solid rgba(255,255,255,0.3); color: var(--paper); }
+.address { color: #9aa1ad; font-size: 0.9rem; }
+.brand-logo { height: 40px; margin-bottom: 24px; opacity: 0.9; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* ===== Tesla-style HUD, custom cursor, spotlight (layered over existing design) ===== */
+
+.hud-font { font-family: "Space Grotesk", "Segoe UI", sans-serif; }
+
+/* headlight follower — only lit while inside dark/anxiety scenes */
+.spotlight-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: radial-gradient(circle 260px at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.10), rgba(255,255,255,0) 65%);
+  mix-blend-mode: screen;
+}
+body.in-dark-scene .spotlight-overlay { opacity: 1; }
+
+/* custom cursor */
+.cursor-dot, .cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 90;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+.cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--accent);
+}
+.cursor-ring {
+  width: 34px; height: 34px;
+  border: 1px solid rgba(214,255,63,0.6);
+  transition: width 0.25s ease, height 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+}
+.cursor-ring.cursor-active {
+  width: 64px; height: 64px;
+  background: rgba(214,255,63,0.08);
+  border-color: var(--accent);
+}
+@media (hover: none) {
+  .cursor-dot, .cursor-ring, .spotlight-overlay { display: none; }
+}
+
+/* HUD panel — 2050 holographic readout: neon edges, scanline sweep, glitch flicker */
+:root {
+  --neon: #38f4ff;
+  --neon-2: #ff2bd6;
+}
+.hud {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 22px;
+  height: 42px;
+  background: rgba(5,10,14,0.55);
+  border: 1px solid rgba(56,244,255,0.35);
+  border-radius: 2px;
+  backdrop-filter: blur(14px);
+  font-family: "Space Grotesk", "Segoe UI", sans-serif;
+  color: var(--paper);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  box-shadow: 0 0 0 1px rgba(56,244,255,0.08), 0 0 18px rgba(56,244,255,0.25), inset 0 0 20px rgba(56,244,255,0.05);
+  animation: hudFlicker 6s infinite;
+}
+.hud::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(56,244,255,0.25) 50%, transparent 100%);
+  height: 3px;
+  top: 0;
+  animation: hudScan 3.2s linear infinite;
+  pointer-events: none;
+}
+@keyframes hudScan {
+  0% { top: 0; opacity: 0.9; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes hudFlicker {
+  0%, 96%, 100% { opacity: 1; }
+  97% { opacity: 0.82; }
+  98% { opacity: 1; }
+  99% { opacity: 0.9; }
+}
+.hud-section { display: flex; align-items: center; height: 100%; }
+.hud-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(56,244,255,0.25);
+  margin: 0 18px;
+}
+
+.hud-gear { gap: 10px; font-family: "Orbitron", "Space Grotesk", sans-serif; }
+.hud-gear span {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: rgba(56,244,255,0.25);
+  position: relative;
+  padding-bottom: 2px;
+}
+.hud-gear span.active { color: var(--neon); text-shadow: 0 0 8px rgba(56,244,255,0.8); }
+.hud-gear span.active::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -6px;
+  height: 1px;
+  background: var(--neon);
+  box-shadow: 0 0 6px var(--neon);
+}
+
+.hud-range { gap: 10px; }
+.hud-caption {
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: rgba(56,244,255,0.55);
+  white-space: nowrap;
+  font-family: "Orbitron", sans-serif;
+}
+.hud-track {
+  position: relative;
+  width: 120px;
+  height: 2px;
+  background: rgba(56,244,255,0.15);
+}
+.hud-track-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0%;
+  background: linear-gradient(90deg, var(--neon-2), var(--neon));
+  box-shadow: 0 0 8px rgba(56,244,255,0.6);
+}
+.hud-track-marker {
+  position: absolute;
+  top: 50%; left: 0%;
+  width: 6px; height: 6px;
+  background: var(--neon);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px 2px rgba(56,244,255,0.9);
+}
+
+.hud-readout {
+  font-size: 12px;
+  letter-spacing: 0.5px;
+  font-variant-numeric: tabular-nums;
+  min-width: 34px;
+  font-family: "Orbitron", sans-serif;
+  color: var(--neon);
+  text-shadow: 0 0 6px rgba(56,244,255,0.6);
+}
+
+@media (max-width: 640px) {
+  .hud { bottom: 12px; padding: 0 12px; height: 34px; }
+  .hud-divider { margin: 0 10px; }
+  .hud-caption { display: none; }
+  .hud-track { width: 70px; }
+}
+
+/* Scene 1: car materializes as neon line-art HUD lock-on while grey fades to white */
+.hud-car-wrap {
+  position: relative;
+  width: min(100%, 420px);
+  margin: 36px auto 0;
+  aspect-ratio: 400 / 140;
+}
+.hud-car { width: 100%; height: 100%; overflow: visible; }
+.car-path, .car-baseline {
+  fill: none;
+  stroke: var(--neon);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 6px rgba(56,244,255,0.7));
+}
+.car-baseline { stroke-width: 1; stroke-dasharray: 400; stroke-dashoffset: 400; opacity: 0.6; }
+.car-wheel {
+  fill: none;
+  stroke: var(--neon-2);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 5px rgba(255,43,214,0.7));
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+}
+.hud-reticle {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(56,244,255,0.7);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.hud-car-wrap.locked .hud-reticle { opacity: 1; }
+.hud-reticle.tl { top: -10px; left: -10px; border-right: none; border-bottom: none; }
+.hud-reticle.tr { top: -10px; right: -10px; border-left: none; border-bottom: none; }
+.hud-reticle.bl { bottom: -10px; left: -10px; border-right: none; border-top: none; }
+.hud-reticle.br { bottom: -10px; right: -10px; border-left: none; border-top: none; }
+.hud-scan-text {
+  margin-top: 14px;
+  text-align: center;
+  font-family: "Orbitron", sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--neon);
+  text-shadow: 0 0 6px rgba(56,244,255,0.7);
+  opacity: 0;
+}
+.hud-scan-text.locked { opacity: 1; animation: textFlicker 2.4s steps(1) infinite; }
+@keyframes textFlicker {
+  0%, 92%, 100% { opacity: 1; }
+  93% { opacity: 0.3; }
+  94% { opacity: 1; }
+}
+
+/* Persistent brand mark */
+.brand-mark {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 85;
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  background: rgba(10,12,16,0.55);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 999px;
+  backdrop-filter: blur(10px);
+}
+.brand-mark img { height: 22px; display: block; }
+@media (max-width: 640px) {
+  .brand-mark { top: 12px; left: 12px; padding: 6px 10px; }
+  .brand-mark img { height: 18px; }
+}
+
+/* Scene 1: logo as the hero's anchor element */
+.hero-logo {
+  height: 64px;
+  margin: 0 auto 20px;
+  display: block;
+  opacity: 0;
+  filter: drop-shadow(0 0 20px rgba(245,243,238,0.25));
+  animation: heroLogoIn 1.2s ease 0.2s forwards;
+}
+@keyframes heroLogoIn {
+  from { opacity: 0; transform: translateY(-12px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 640px) {
+  .hero-logo { height: 44px; }
+}
+
+/* Scene 2: keep noise shards clear of the centered headline on narrow screens */
+@media (max-width: 640px) {
+  .shard { font-size: 11px; padding: 6px 10px; }
+  .s1 { top: 8%; left: 6%; }
+  .s2 { top: 88%; left: 8%; }
+  .s3 { top: 14%; right: 6%; }
+  .s4 { top: 82%; right: 8%; }
+  .s5 { display: none; }
+}
+
+/* Scene 5: vehicle frames dissolve into the road instead of reading as a gallery. */
+.scene-5 {
+  padding-top: 60px;
+  padding-bottom: 60px;
+  background: linear-gradient(180deg, #111720 0%, #1a2a2d 52%, #10171b 100%);
+}
+.scene-5::before {
+  content: "";
+  position: absolute;
+  inset: auto -15% 8% -15%;
+  height: 28%;
+  background: repeating-linear-gradient(90deg, transparent 0 8%, rgba(214,255,63,0.2) 8% 13%, transparent 13% 26%);
+  transform: perspective(400px) rotateX(64deg);
+  z-index: 3;
+  opacity: 0.35;
+  pointer-events: none;
+}
+.scene-5 .scene-content {
+  position: absolute;
+  top: 12vh;
+  left: max(24px, 8vw);
+  z-index: 5;
+  margin: 0;
+  text-align: left;
+  pointer-events: none;
+}
+.fleet-track {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  gap: 0;
+  margin: 0;
+}
+.fleet-card {
+  min-width: 100vw;
+  height: 100%;
+  padding: 0 10vw 11vh;
+  justify-content: flex-end;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  border-radius: 0;
+  filter: brightness(0.22) saturate(0.45);
+  transition: filter 0.65s ease, transform 0.65s ease;
+}
+.fleet-card.is-active {
+  filter: brightness(1) saturate(1.05);
+  transform: none;
+}
+.fleet-card::after {
+  background: linear-gradient(90deg, rgba(12,18,22,0.78) 0%, rgba(12,18,22,0.08) 30%, transparent 68%, rgba(12,18,22,0.68) 100%), linear-gradient(180deg, rgba(9,14,18,0.1) 36%, rgba(9,14,18,0.84) 100%);
+}
+.fleet-index {
+  position: absolute;
+  top: 27vh;
+  left: 10vw;
+  font-family: "Orbitron", sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: rgba(245,243,238,0.6);
+}
+.fleet-card span:not(.fleet-index) { font-size: clamp(1.4rem, 2.2vw, 2rem); }
+.fleet-progress { position: absolute; z-index: 5; bottom: 72px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px; justify-content: center; margin: 0; }
+.fleet-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.2); transition: background 0.3s ease, transform 0.3s ease; }
+.fleet-dot.active { background: var(--accent); transform: scale(1.3); }
+.testimonial-pop { display: none; }
+
+@media (max-width: 640px) {
+  .scene-5 { min-height: 100svh; padding: 60px 0 76px; }
+  .scene-5 .scene-content { position: relative; top: auto; left: auto; z-index: auto; margin-left: 8vw; }
+  .fleet-track {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: row;
+    transform: none !important;
+    width: 100%;
+    overflow-x: auto;
+    gap: 5vw;
+    padding: 0 8vw 14px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .fleet-track::-webkit-scrollbar { display: none; }
+  .fleet-card {
+    min-width: 84vw;
+    width: 84vw;
+    height: 54vh;
+    filter: brightness(1) saturate(1);
+    background-size: cover;
+    scroll-snap-align: center;
+  }
+  .fleet-progress { display: none; }
+}
+
+/* Scene 7: Fahrschule Avo-specific booking form */
+.contact-content { max-width: 560px; text-align: left; }
+.contact-content .headline, .contact-content .subline { text-align: center; }
+.booking-form { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+.form-row { display: flex; gap: 12px; }
+.form-row > * { flex: 1; }
+.booking-form input, .booking-form select, .booking-form textarea {
+  width: 100%;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  color: var(--paper);
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.booking-form input::placeholder, .booking-form textarea::placeholder { color: #7d8494; }
+.booking-form select { color: #d6d9de; }
+.booking-form textarea { resize: vertical; }
+.consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #9aa1ad;
+  line-height: 1.4;
+}
+.consent-row input { width: auto; margin-top: 3px; }
+.consent-row a { color: var(--accent); }
+.booking-form .cta-primary { border: none; cursor: pointer; margin-top: 6px; }
+.form-hint { font-size: 12px; color: var(--accent); min-height: 16px; }
+.contact-block { display: flex; flex-direction: column; gap: 6px; margin-top: 24px; font-size: 0.9rem; }
+.contact-block a { color: var(--paper); text-decoration: none; opacity: 0.85; }
+.contact-block a:hover { opacity: 1; text-decoration: underline; }
+.google-badge {
+  display: inline-block;
+  margin-top: 18px;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--accent);
+  text-decoration: none;
+  border: 1px solid rgba(214,255,63,0.3);
+  padding: 8px 14px;
+  border-radius: 999px;
+}
+@media (max-width: 640px) {
+  .form-row { flex-direction: column; }
+}
