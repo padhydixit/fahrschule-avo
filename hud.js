@@ -95,7 +95,7 @@
           trackFill.style.width = `${pct}%`;
           trackMarker.style.left = `${pct}%`;
           hudRange.textContent = `${Math.round(pct)}%`;
-          const isReady = pct >= 9;
+          const isReady = pct >= 1;
           if (isReady !== confidenceReady) {
             confidenceReady = isReady;
             document.body.classList.toggle("confidence-ready", isReady);
@@ -103,6 +103,8 @@
               carTimeline?.play();
             } else {
               carTimeline?.pause(0);
+              carWrap?.classList.remove("locked");
+              scanText?.classList.remove("locked");
             }
           }
         },
@@ -112,6 +114,7 @@
 
   /* ---------- Scene 1: neon car materializes + reticle locks on, synced to grey->white grade ---------- */
   const carBody = document.getElementById("carBody");
+  const carGlass = document.getElementById("carGlass");
   const carBaseline = document.getElementById("carBaseline");
   const wheelA = document.getElementById("wheelA");
   const wheelB = document.getElementById("wheelB");
@@ -119,14 +122,23 @@
   const scanText = document.getElementById("hudScanText");
 
   const bodyLength = carBody.getTotalLength();
+  const glassLength = carGlass.getTotalLength();
   carBody.style.strokeDasharray = bodyLength;
   carBody.style.strokeDashoffset = bodyLength;
+  carGlass.style.strokeDasharray = glassLength;
+  carGlass.style.strokeDashoffset = glassLength;
+  [wheelA, wheelB].forEach((wheel) => {
+    const wheelLength = wheel.getTotalLength();
+    wheel.style.strokeDasharray = wheelLength;
+    wheel.style.strokeDashoffset = wheelLength;
+  });
 
   carTimeline = gsap.timeline({ paused: true });
   carTimeline
     .to(carBaseline, { strokeDashoffset: 0, duration: 1 }, 0)
     .to(carBody, { strokeDashoffset: 0, duration: 2.2 }, 0.3)
-    .to([wheelA, wheelB], { scale: 1, duration: 0.8, ease: "back.out(2)" }, 2.3)
+    .to(carGlass, { strokeDashoffset: 0, duration: 1.2 }, 1.2)
+    .to([wheelA, wheelB], { strokeDashoffset: 0, opacity: 1, duration: 0.8, ease: "power2.out" }, 2.3)
     .call(() => carWrap.classList.add("locked"), null, 2.8)
     .call(() => scanText.classList.add("locked"), null, 2.9);
 })();

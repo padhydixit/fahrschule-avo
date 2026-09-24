@@ -22,6 +22,9 @@ window.addEventListener("scroll", updateProgressBar, { passive: true });
 window.addEventListener("resize", updateProgressBar);
 updateProgressBar();
 
+const appointmentDate = document.getElementById("wunschdatum");
+appointmentDate?.addEventListener("click", () => appointmentDate.showPicker?.());
+
 // SCENE 1: keep the opening focused before moving into the next scene.
 ScrollTrigger.create({
   trigger: ".scene-1",
@@ -31,18 +34,46 @@ ScrollTrigger.create({
   pinSpacing: true,
 });
 
-// SCENE 2: noise shards drift with scroll (parallax jitter)
-gsap.utils.toArray(".shard").forEach((shard, i) => {
-  gsap.to(shard, {
-    y: (i % 2 === 0 ? 1 : -1) * 60,
-    rotation: (i % 2 === 0 ? 1 : -1) * 8,
-    scrollTrigger: {
-      trigger: ".scene-2",
-      start: "top bottom",
-      end: "bottom top",
-      scrub: true,
-    },
+// SCENE 2: questions appear one by one as uncertainty builds.
+const questionShards = gsap.utils.toArray(".shard");
+const questionTimeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".scene-2",
+    start: "top top",
+    end: "+=70%",
+    pin: true,
+    pinSpacing: true,
+    scrub: 0.15,
+  },
+});
+
+questionShards.forEach((shard, i) => {
+  const direction = i % 2 === 0 ? 1 : -1;
+  const impactAt = i * 0.55;
+  gsap.set(shard, {
+    autoAlpha: 0,
+    scale: 2.2,
+    y: direction * 90,
+    rotation: direction * 11,
+    skewX: direction * 9,
+    filter: "blur(9px)",
   });
+  questionTimeline
+    .to(shard, { autoAlpha: 1, duration: 0.06, ease: "none" }, impactAt)
+    .to(
+      shard,
+      {
+        scale: 0.9,
+        y: 0,
+        rotation: 0,
+        skewX: 0,
+        filter: "blur(0px)",
+        duration: 0.34,
+        ease: "power4.in",
+      },
+      impactAt
+    )
+    .to(shard, { scale: 1, duration: 0.16, ease: "back.out(4)" }, impactAt + 0.34);
 });
 
 // SCENE 3: draw route path as user scrolls, activate steps sequentially
@@ -65,21 +96,56 @@ document.querySelectorAll(".route-step").forEach((step, i) => {
   });
 });
 
-// SCENE 4: parallax road layers + card stagger reveal
-gsap.to(".road-layer.buildings", {
-  x: -80,
-  scrollTrigger: { trigger: ".scene-4", start: "top bottom", end: "bottom top", scrub: true },
+// SCENE 4: move gently into Hamburg while each licence choice resolves in sequence.
+gsap.to(".road-parallax", {
+  scale: 1.09,
+  xPercent: -1.5,
+  ease: "none",
+  scrollTrigger: {
+    trigger: ".scene-4",
+    start: "top bottom",
+    end: "bottom top",
+    scrub: true,
+  },
 });
-gsap.to(".road-layer.road", {
-  backgroundPosition: "200px 0",
-  scrollTrigger: { trigger: ".scene-4", start: "top bottom", end: "bottom top", scrub: true },
+
+const licenceCards = gsap.utils.toArray(".scene-4 .card");
+const licenceTimeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: ".scene-4",
+    start: () => window.innerWidth <= 640 ? "top 35%" : "top 65%",
+    end: () => window.innerWidth <= 640 ? "top -20%" : "top 15%",
+    scrub: true,
+    invalidateOnRefresh: true,
+  },
 });
-document.querySelectorAll(".card").forEach((card, i) => {
-  ScrollTrigger.create({
-    trigger: card,
-    start: "top 85%",
-    onEnter: () => card.classList.add("in-view"),
-  });
+
+licenceCards.forEach((card, i) => {
+  const border = document.createElement("span");
+  border.className = "card-border-draw";
+  border.setAttribute("aria-hidden", "true");
+  card.appendChild(border);
+
+  licenceTimeline.to(
+    border,
+    {
+      width: "calc(100% + 2px)",
+      opacity: 1,
+      duration: 0.7,
+      ease: "power2.out",
+    },
+    i * 0.85
+  ).to(
+    card,
+    {
+      backgroundColor: () => window.innerWidth <= 640 ? "rgba(7,11,15,0.52)" : "rgba(10,14,18,0.68)",
+      boxShadow: "0 0 0 1px rgba(214,255,63,0.3), 0 16px 38px rgba(0,0,0,0.42), inset 0 0 24px rgba(214,255,63,0.08)",
+      y: -5,
+      duration: 0.15,
+      ease: "power2.out",
+    },
+    i * 0.85 + 0.7
+  );
 });
 
 // SCENE 5: horizontal fleet reveal — pinned for the exact horizontal distance so
@@ -129,6 +195,30 @@ ScrollTrigger.matchMedia({
         onEnter: () => bubble.classList.add("in-view"),
         onLeaveBack: () => bubble.classList.remove("in-view"),
       });
+    });
+  },
+  "(max-width: 640px)": function () {
+    const getMobileScrollDistance = () => fleetTrack.scrollWidth - fleetTrack.clientWidth;
+
+    gsap.to(fleetTrack, {
+      scrollLeft: () => getMobileScrollDistance(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".scene-5",
+        start: "top top",
+        end: () => `+=${getMobileScrollDistance()}`,
+        pin: true,
+        pinSpacing: true,
+        scrub: true,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          const activeIndex = Math.min(
+            fleetCards.length - 1,
+            Math.floor(self.progress * fleetCards.length)
+          );
+          fleetCards.forEach((card, i) => card.classList.toggle("is-active", i === activeIndex));
+        },
+      },
     });
   },
 });

@@ -13,6 +13,7 @@
   <!-- persistent brand mark, visible across every scene -->
   <a class="brand-mark" href="#top" aria-label="Fahrschule Avo Startseite">
     <img src="Pictures/avo-logo-white.png" alt="Fahrschule Avo" />
+    <span class="brand-lockup"><strong>FAHRSCHULE AVO</strong><small>HAMBURG-WANDSBEK</small></span>
   </a>
 
   <!-- headlight that follows the cursor through the dark anxiety scenes -->
@@ -55,8 +56,13 @@
       <div class="grain"></div>
       <div class="vignette"></div>
       <div class="scene-content">
-        <img class="hero-logo" src="Pictures/avo-logo-white.png" alt="Fahrschule Avo" />
-        <p class="eyebrow">FAHRSCHULE AVO · HAMBURG-WANDSBEK</p>
+        <div class="hero-brand">
+          <img class="hero-logo" src="Pictures/avo-logo-white.png" alt="Fahrschule Avo" />
+          <div class="hero-brand-copy">
+            <strong>FAHRSCHULE <em>AVO</em></strong>
+            <span>HAMBURG-WANDSBEK</span>
+          </div>
+        </div>
         <h1 class="headline word-reveal">
           <span>Jeder</span> <span>fängt</span> <span>bei</span> <span>Null</span> <span>an.</span>
         </h1>
@@ -70,11 +76,13 @@
           <div class="hud-reticle br"></div>
           <svg class="hud-car" viewBox="0 0 400 140" preserveAspectRatio="xMidYMid meet">
             <line id="carBaseline" class="car-baseline" x1="10" y1="122" x2="390" y2="122" />
-            <path id="carBody" class="car-path" d="M20,100 C20,80 40,80 60,78 L110,50 C130,38 160,32 195,32 L260,32 C285,32 300,45 310,60 L370,70 C382,72 388,80 388,90 L388,100 L20,100" />
-            <circle id="wheelA" class="car-wheel" cx="95" cy="104" r="17" />
-            <circle id="wheelB" class="car-wheel" cx="300" cy="104" r="17" />
+            <path id="carBody" class="car-path" d="M17,100 C19,87 29,80 51,77 C78,73 93,61 112,48 C137,31 169,25 211,25 C255,25 282,35 307,57 C317,66 333,70 365,75 C380,78 388,86 389,98 L374,102 L339,102 C335,84 323,75 306,75 C288,75 276,85 272,102 L121,102 C117,84 105,75 88,75 C70,75 58,85 54,102 L28,102 Z" />
+            <path id="carGlass" class="car-detail" d="M111,59 C135,35 166,30 207,30 C246,30 270,38 294,58 L218,58 Z M105,63 L200,63 L121,82" />
+            <path class="car-detail car-light" d="M350,78 L376,83 M22,91 L43,88" />
+            <circle id="wheelA" class="car-wheel" cx="88" cy="103" r="18" />
+            <circle id="wheelB" class="car-wheel" cx="306" cy="103" r="18" />
           </svg>
-          <div class="hud-scan-text" id="hudScanText">VEHICLE DETECTED // STATUS: READY</div>
+          <div class="hud-scan-text" id="hudScanText">FAHRZEUG ERKANNT // STATUS: BEREIT</div>
         </div>
 
         <div class="scroll-cue">Scroll ↓</div>
@@ -118,10 +126,13 @@
     <section class="scene scene-4" data-scene="4">
       <div class="road-parallax">
         <div class="road-layer sky"></div>
+        <div class="road-layer elbe"></div>
         <div class="road-layer buildings"></div>
+        <div class="road-layer elbphilharmonie" aria-hidden="true"></div>
         <div class="road-layer road"></div>
       </div>
       <div class="scene-content">
+        <p class="eyebrow scene-signature">FAHRSCHULE AVO · HAMBURG</p>
         <h2 class="headline light">Dein Führerschein.</h2>
         <div class="license-cards">
           <div class="card cursor-hover"><h3>B</h3><p>Der klassische Autoführerschein.</p><small>AB 18 JAHREN</small></div>
@@ -135,7 +146,7 @@
     <!-- SCENE 5: FULL ACCELERATION — fleet reveal, horizontal feel -->
     <section class="scene scene-5" data-scene="5">
       <div class="scene-content">
-        <p class="eyebrow">UNSER FUHRPARK</p>
+        <p class="fleet-brandline"><strong>FAHRSCHULE AVO</strong><span>FUHRPARK</span></p>
         <h2 class="headline light">Modern. Ruhig. Sicher.</h2>
       </div>
       <div class="fleet-track" id="fleetTrack">
@@ -180,6 +191,7 @@
     <section class="scene scene-7" data-scene="7">
       <div class="scene-content contact-content">
         <img class="brand-logo" src="Pictures/avo-logo-white.png" alt="Fahrschule Avo Logo" />
+        <p class="eyebrow">FAHRSCHULE AVO · HAMBURG-WANDSBEK</p>
         <h2 class="headline">Dein Führerschein?<br />Startet hier.</h2>
         <p class="subline">Trag deinen Terminwunsch ein. Wir melden uns persönlich bei dir und bestätigen den passenden Zeitpunkt.</p>
 
@@ -203,7 +215,7 @@
             </select>
           </div>
           <div class="form-row">
-            <input class="cursor-hover" type="date" name="datum" placeholder="Wunschdatum" />
+            <input class="cursor-hover" id="wunschdatum" type="date" name="datum" aria-label="Wunschdatum" />
             <input class="cursor-hover" type="time" name="uhrzeit" placeholder="Bevorzugte Uhrzeit" />
           </div>
           <textarea class="cursor-hover" name="nachricht" placeholder="Deine Nachricht (optional)" rows="3"></textarea>
